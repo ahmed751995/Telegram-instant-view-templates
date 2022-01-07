@@ -1,0 +1,65 @@
+# set the IV version
+~version: "2.1"
+
+# set a path to pages that should be loaded
+?path:/ar/article/.+
+
+# RTL in html
+@set_attr(dir, "rtl"): /html
+
+# set the body 
+body: //main//div[has-class("col-xl-9")]
+
+# replace each tag <img> inside the <a> tag to <figure> in the body
+@replace_tag(<figure>): $body//a[.//img]
+
+#  replace each tag <img> inside the <p> tag to <figure> in the body
+@replace_tag(<figure>): $body//p[.//img]
+# set title
+$title_body: $body//div[has-class("single-title")]
+title: $title_body//h1
+
+# fix the iframe
+# @debug: //p[descendant::iframe]
+<div>: //p[descendant::iframe]
+
+
+#get uraware telegram channels
+@clone: //aside[@id="sticky-social"]//a[has-class("fa-telegram")]/@href
+@match("/[a-z0-9_]+"): $@
+@replace("/", "@"): $@
+channel
+
+#another sol
+# this code snippte from this template https://instantview.telegram.org/samples/telegra.ph/?url=https%3A%2F%2Ftelegra.ph%2FGifs-FAQ
+# @clone: //aside[@id="sticky-social"]//a[has-class("fa-telegram")]/@href
+# @match("t(elegram)?\\.me/([a-z0-9_]+)$", 2, "i"): $@
+# @replace(".+", "@$0")
+# @debug: $@
+# channel: $@
+
+# cover image
+<figure>: $body//div[has-class("post-thumb")]
+<figcaption> : $body//figure[has-class("post-thumb")]//h5
+cover: $body//figure[has-class("post-thumb")]
+
+# set description to instant view
+description: $body//figure[has-class("post-thumb")]//figcaption
+
+# set author and date
+$single_meta: $body//div[has-class("single-meta")]
+@replace_tag(<p>): $single_meta/ul//span
+author: $single_meta//i[has-class("fa-user-circle-o")]/../p
+published_date: $single_meta//i[has-class("fa-clock-o")]/../p
+
+# related articles
+$related_articles : $body//div[has-class("related-posts")]
+<related>: $related_articles
+
+#cleaning
+@remove: $body//div[has-class("font-size")]
+@remove: $title_body//div[has-class("fav")]
+@remove: $single_meta
+@remove: $body//div[has-class("keywords-short-link")]
+@remove: $body//div[has-class("social-share")]
+@remove: $body//div[has-class("lick-arrow")]
